@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import EditProfileModal from '../../components/EditProfileModal/EditProfileModal';
 import defaultAvatarImage from '../../assets/images/default-avatar.png';
 import defaultPostImage from '../../assets/images/default-post.png';
 import EditIcon from '../../assets/icons/edit.svg';
@@ -194,6 +195,13 @@ const UserProfilePage = () => {
   const [userPosts, setUserPosts] = useState([]); // Добавлено состояние для постов
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const handleEditProfile = updatedData => {
+    // Здесь будет логика обновления данных пользователя
+    console.log('Updated profile data:', updatedData);
+  };
+
   useEffect(() => {
     // Получаем данные пользователя
     const userData = getUserById(currentUserId);
@@ -284,16 +292,20 @@ const UserProfilePage = () => {
             <span>{user.firstName}</span>
             <span>{user.lastName}</span>
           </div>
-          <button className={styles.editProfileButton}>
+          <button className={styles.editProfileButton} onClick={() => setIsEditModalOpen(true)}>
             <img src={EditIcon} alt="Edit profile" />
           </button>
+
+          <EditProfileModal
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            user={user}
+            onSave={handleEditProfile}
+          />
         </div>
 
         {/* Кнопка создания поста */}
-        <button 
-          className={styles.createPostButton}
-          onClick={() => setIsModalOpen(true)}
-        >
+        <button className={styles.createPostButton} onClick={() => setIsModalOpen(true)}>
           <img src={PlusIcon} alt="Create post" />
           <span>Создать пост</span>
         </button>
@@ -307,22 +319,20 @@ const UserProfilePage = () => {
                   src={user.avatar || defaultAvatarImage}
                   alt="Avatar"
                   className={styles.authorAvatar}
-                  onError={(e) => { e.target.src = defaultAvatarImage; }}
+                  onError={e => {
+                    e.target.src = defaultAvatarImage;
+                  }}
                 />
                 <div className={styles.authorInfo}>
                   <div className={styles.authorName}>
                     <span>{user.firstName}</span>
                     <span>{user.lastName}</span>
                   </div>
-                  <div className={styles.postDate}>
-                    {formatDate(post.createdAt)}
-                  </div>
+                  <div className={styles.postDate}>{formatDate(post.createdAt)}</div>
                 </div>
               </div>
 
-              {post.text && (
-                <p className={styles.postText}>{post.text}</p>
-              )}
+              {post.text && <p className={styles.postText}>{post.text}</p>}
 
               {post.image && (
                 <div className={styles.postContent}>
@@ -330,7 +340,9 @@ const UserProfilePage = () => {
                     src={post.image || defaultPostImage}
                     alt="Post content"
                     className={styles.postImage}
-                    onError={(e) => { e.target.src = defaultPostImage; }}
+                    onError={e => {
+                      e.target.src = defaultPostImage;
+                    }}
                   />
                   <div className={styles.postActions}>
                     <button
@@ -347,9 +359,8 @@ const UserProfilePage = () => {
         </div>
       </div>
 
-
       {/* Правая секция (будет реализована позже) */}
-      <div className={styles.rightSection}>{/* Контент будет добавлен позже */}</div>
+      <div className={styles.rightSection}>{/* Тут будут категории выбраные пользователем */}</div>
 
       <CreatePostModal
         isOpen={isModalOpen}
